@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabaseClient.js";
-import type { Dataset } from "@shared/seed.js";
+import { generateDataset, DEMO_ACCOUNT_REFS, type Dataset } from "@shared/seed.js";
 import {
   adminStats,
   attendanceTrends,
@@ -38,6 +38,8 @@ import type {
 } from "./types.js";
 
 const THRESHOLD = Number(import.meta.env.VITE_ATTENDANCE_THRESHOLD ?? 75);
+// Shared password set by scripts/seed-supabase.ts for all seeded demo users.
+const SEED_PASSWORD = "AttendX!demo123";
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -61,12 +63,18 @@ export class SupabaseDirectRepository implements Repository {
 
   // ---- Auth --------------------------------------------------------------
 
+  // Offer a one-click selector of the seeded cloud accounts. The `profileId`
+  // field carries the email; loginDemo signs in with the shared seed password.
   async listDemoAccounts(): Promise<DemoAccount[]> {
-    return [];
+    const ds = generateDataset();
+    return DEMO_ACCOUNT_REFS.map((ref) => {
+      const profile = ds.profiles.find((p) => p.id === ref.profileId)!;
+      return { label: ref.label, profileId: profile.email, role: ref.role, name: profile.fullName, email: profile.email };
+    });
   }
 
-  async loginDemo(): Promise<SessionUser> {
-    throw new Error("Use email + password to sign in (Supabase mode).");
+  async loginDemo(emailHandle: string): Promise<SessionUser> {
+    return this.loginWithPassword(emailHandle, SEED_PASSWORD);
   }
 
   async loginWithPassword(email: string, password: string): Promise<SessionUser> {

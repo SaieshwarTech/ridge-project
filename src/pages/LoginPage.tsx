@@ -15,13 +15,21 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [accounts, setAccounts] = useState<DemoAccount[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    getRepository().listDemoAccounts().then(setAccounts);
+    getRepository()
+      .listDemoAccounts()
+      .then(setAccounts)
+      .finally(() => setLoaded(true));
   }, []);
+
+  // Show the one-click selector whenever accounts are available (demo mode and
+  // browser-direct Supabase mode); fall back to the password form otherwise.
+  const useSelector = accounts.length > 0;
 
   const handleDemo = async (acc: DemoAccount) => {
     setBusy(acc.profileId);
@@ -76,9 +84,10 @@ export default function LoginPage() {
 
           <h1 className="text-xl font-bold text-ink">Sign in</h1>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-muted">
-            {mode === "demo" ? (
+            {useSelector ? (
               <>
-                <FlaskConical className="h-4 w-4 text-accent-violet" /> Demo mode — pick an account below
+                <FlaskConical className="h-4 w-4 text-accent-violet" />
+                {mode === "demo" ? "Demo mode — pick an account below" : "Pick an account to sign in"}
               </>
             ) : (
               <>
@@ -87,7 +96,9 @@ export default function LoginPage() {
             )}
           </p>
 
-          {mode === "demo" ? (
+          {!loaded ? (
+            <div className="mt-6 h-32 animate-pulse rounded-lg bg-white/5" />
+          ) : useSelector ? (
             <div className="mt-6 space-y-2.5">
               {accounts.map((acc) => {
                 const Icon = roleIcon[acc.role];
@@ -110,7 +121,9 @@ export default function LoginPage() {
                 );
               })}
               <p className="pt-2 text-center text-xs text-ink-faint">
-                No password needed in demo mode. Switch to cloud mode via <code className="text-accent-cyan">VITE_APP_MODE=cloud</code>.
+                {mode === "demo"
+                  ? "No password needed in demo mode — data stays in your browser."
+                  : "One-click sign-in to the live Supabase database using the shared demo password."}
               </p>
             </div>
           ) : (
