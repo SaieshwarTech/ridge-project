@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-ink font-sans antialiased;
+    background-image: radial-gradient(1200px 600px at 100% -10%, rgba(124, 92, 252, 0.08), transparent),
+      radial-gradient(900px 500px at -10% 10%, rgba(34, 211, 238, 0.06), transparent);
+    background-attachment: fixed;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background: rgba(148, 163, 184, 0.2);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.35);
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent-violet/70 ring-offset-2 ring-offset-bg;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-border bg-panel shadow-panel;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-white/5;
+  }
+  .skeleton::after {
+    content: "";
+    @apply absolute inset-0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.4s infinite;
+  }
+
+  .text-gradient {
+    @apply bg-accent-gradient bg-clip-text text-transparent;
+  }
+}
