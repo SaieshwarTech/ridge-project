@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { getRepository, APP_MODE } from "@/repo/index.js";
+import { getRepository, APP_MODE, type AppMode } from "@/repo/index.js";
 import type { SessionUser } from "@shared/types.js";
 
 interface AuthState {
   user: SessionUser | null;
   loading: boolean;
-  mode: "demo" | "cloud";
+  mode: AppMode;
   loginDemo: (profileId: string) => Promise<void>;
   loginWithPassword: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
